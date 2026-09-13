@@ -147,14 +147,14 @@ button.main:active{
 /* Settings Button */
 .settings-btn{
   position:absolute;
-  top:15px;
-  right:15px;
-  width:48px;
-  height:48px;
+  top:10px;
+  right:10px;
+  width:40px;
+  height:40px;
   border:none;
   border-radius:50%;
   background:white;
-  font-size:24px;
+  font-size:20px;
   cursor:pointer;
   box-shadow:0 5px 15px rgba(0,0,0,.2);
 }
@@ -341,7 +341,7 @@ button.main:active{
     </div>
 
     <button class="main" id="restartBtn">
-      🔄 फिर से खेलें
+      🔄 Try Again 
     </button>
 
   </div>
@@ -576,7 +576,7 @@ function wrongSound(){
   );
 
   gain.gain.exponentialRampToValueAtTime(
-    0.06,
+    0.012,
     now + 0.02
   );
 
@@ -602,8 +602,7 @@ settingsBtn.addEventListener("click", function(){
 
   settings.style.display = "flex";
 
-  if(soundEnabled){
-    playTone(700, 0.08);
+  
   }
 
 });
