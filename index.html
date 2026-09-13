@@ -1,1 +1,1068 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Master Kids</title>
 
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+  background:linear-gradient(135deg,#6a5cff,#00c6ff);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+}
+
+.game{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:25px;
+  padding:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.25);
+  text-align:center;
+}
+
+h1{
+  color:#4b3cc4;
+  font-size:30px;
+  margin-bottom:5px;
+}
+
+.subtitle{
+  color:#777;
+  margin-bottom:18px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.info{
+  flex:1;
+  background:#f2f4ff;
+  padding:10px 5px;
+  border-radius:14px;
+  font-weight:bold;
+  color:#333;
+}
+
+.question{
+  background:#f7f8ff;
+  border-radius:20px;
+  padding:25px 10px;
+  margin-bottom:18px;
+}
+
+#question{
+  font-size:38px;
+  font-weight:bold;
+  color:#29245c;
+}
+
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.answer{
+  border:none;
+  padding:17px 10px;
+  border-radius:16px;
+  background:#eee;
+  font-size:23px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.15s;
+  box-shadow:0 4px 0 #ccc;
+}
+
+.answer:active{
+  transform:translateY(3px);
+  box-shadow:0 1px 0 #ccc;
+}
+
+.answer.correct{
+  background:#35c96f !important;
+  color:white;
+}
+
+.answer.wrong{
+  background:#ff5252 !important;
+  color:white;
+}
+
+#message{
+  min-height:30px;
+  margin:15px 0 5px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.timer{
+  height:10px;
+  background:#ddd;
+  border-radius:10px;
+  overflow:hidden;
+  margin:15px 0;
+}
+
+#timerBar{
+  height:100%;
+  width:100%;
+  background:#36c96f;
+  transition:width 1s linear;
+}
+
+button.main{
+  width:100%;
+  border:none;
+  padding:14px;
+  border-radius:15px;
+  background:#4b3cc4;
+  color:white;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:12px;
+}
+
+button.main:active{
+  transform:scale(.98);
+}
+
+/* Settings Button */
+.settings-btn{
+  position:absolute;
+  top:15px;
+  right:15px;
+  width:48px;
+  height:48px;
+  border:none;
+  border-radius:50%;
+  background:white;
+  font-size:24px;
+  cursor:pointer;
+  box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+/* Settings Box */
+.settings{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  z-index:10;
+}
+
+.settings-box{
+  width:100%;
+  max-width:360px;
+  background:white;
+  border-radius:22px;
+  padding:25px;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+
+.settings-box h2{
+  color:#4b3cc4;
+  margin-bottom:22px;
+}
+
+.sound-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#f3f4ff;
+  padding:15px;
+  border-radius:15px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.switch{
+  position:relative;
+  width:58px;
+  height:32px;
+}
+
+.switch input{
+  display:none;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+  background:#bbb;
+  border-radius:30px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:26px;
+  height:26px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.3s;
+}
+
+.switch input:checked + .slider{
+  background:#35c96f;
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(26px);
+}
+
+.close-btn{
+  width:100%;
+  border:none;
+  padding:13px;
+  margin-top:20px;
+  border-radius:14px;
+  background:#4b3cc4;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
+
+.game-over{
+  display:none;
+}
+
+.final-score{
+  font-size:32px;
+  color:#4b3cc4;
+  font-weight:bold;
+  margin:20px 0;
+}
+
+@media(max-width:350px){
+  h1{
+    font-size:26px;
+  }
+
+  #question{
+    font-size:32px;
+  }
+
+  .answer{
+    font-size:20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Settings Button -->
+<button class="settings-btn" id="settingsBtn">⚙️</button>
+
+<div class="game">
+
+  <div id="gameScreen">
+
+    <h1>🧠 Math Master Kids</h1>
+    <div class="subtitle">मज़ेदार तरीके से गणित सीखें!</div>
+
+    <div class="top">
+      <div class="info">
+        🏆 Score<br>
+        <span id="score">0</span>
+      </div>
+
+      <div class="info">
+        ❤️ Lives<br>
+        <span id="lives">3</span>
+      </div>
+
+      <div class="info">
+        ⏱️ Time<br>
+        <span id="time">15</span>
+      </div>
+    </div>
+
+    <div class="question">
+      <div id="question">5 + 3 = ?</div>
+    </div>
+
+    <div class="answers">
+      <button class="answer"></button>
+      <button class="answer"></button>
+      <button class="answer"></button>
+      <button class="answer"></button>
+    </div>
+
+    <div class="timer">
+      <div id="timerBar"></div>
+    </div>
+
+    <div id="message"></div>
+
+    <button class="main" id="nextBtn" style="display:none;">
+      अगला सवाल ➜
+    </button>
+
+  </div>
+
+  <!-- Game Over -->
+  <div class="game-over" id="gameOver">
+
+    <h1>🎉 Game Complete!</h1>
+
+    <p style="margin-top:10px;">
+      आपका Final Score
+    </p>
+
+    <div class="final-score" id="finalScore">
+      0
+    </div>
+
+    <button class="main" id="restartBtn">
+      🔄 फिर से खेलें
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- SETTINGS -->
+<div class="settings" id="settings">
+
+  <div class="settings-box">
+
+    <h2>⚙️ Settings</h2>
+
+    <div class="sound-row">
+
+      <span>🔊 Sound</span>
+
+      <label class="switch">
+        <input type="checkbox" id="soundToggle">
+        <span class="slider"></span>
+      </label>
+
+    </div>
+
+    <button class="close-btn" id="closeSettings">
+      ✓ Done
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* ==================================
+   GAME VARIABLES
+   ================================== */
+
+let score = 0;
+let lives = 3;
+let timeLeft = 15;
+let correctAnswer = 0;
+let timer = null;
+
+
+/* ==================================
+   ELEMENTS
+   ================================== */
+
+const question = document.getElementById("question");
+const answerButtons = document.querySelectorAll(".answer");
+
+const scoreText = document.getElementById("score");
+const livesText = document.getElementById("lives");
+const timeText = document.getElementById("time");
+
+const timerBar = document.getElementById("timerBar");
+const message = document.getElementById("message");
+
+const nextBtn = document.getElementById("nextBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+const gameScreen = document.getElementById("gameScreen");
+const gameOver = document.getElementById("gameOver");
+const finalScore = document.getElementById("finalScore");
+
+const settingsBtn = document.getElementById("settingsBtn");
+const settings = document.getElementById("settings");
+const closeSettings = document.getElementById("closeSettings");
+const soundToggle = document.getElementById("soundToggle");
+
+
+/* ==================================
+   SOUND SYSTEM
+   ================================== */
+
+let audioCtx = null;
+
+
+/* Sound ON/OFF saved */
+let soundEnabled =
+  localStorage.getItem("mathMasterSound") !== "off";
+
+soundToggle.checked = soundEnabled;
+
+
+/* Initialize audio */
+function initSound(){
+
+  if(!audioCtx){
+
+    audioCtx = new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )();
+
+  }
+
+  if(audioCtx.state === "suspended"){
+    audioCtx.resume();
+  }
+}
+
+
+/* Small helper */
+function playTone(frequency, duration, type="sine", volume=0.05){
+
+  if(!soundEnabled) return;
+
+  initSound();
+
+  const now = audioCtx.currentTime;
+
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  oscillator.type = type;
+
+  oscillator.frequency.setValueAtTime(
+    frequency,
+    now
+  );
+
+  gain.gain.setValueAtTime(
+    0.001,
+    now
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    volume,
+    now + 0.01
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    now + duration
+  );
+
+  oscillator.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  oscillator.start(now);
+
+  oscillator.stop(
+    now + duration + 0.02
+  );
+}
+
+
+/* ✅ Correct Answer Sound */
+function correctSound(){
+
+  if(!soundEnabled) return;
+
+  initSound();
+
+  const now = audioCtx.currentTime;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "sine";
+
+  osc.frequency.setValueAtTime(
+    650,
+    now
+  );
+
+  osc.frequency.setValueAtTime(
+    850,
+    now + 0.08
+  );
+
+  osc.frequency.setValueAtTime(
+    1050,
+    now + 0.16
+  );
+
+  gain.gain.setValueAtTime(
+    0.001,
+    now
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.08,
+    now + 0.02
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    now + 0.30
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+
+  osc.stop(now + 0.32);
+}
+
+
+/* ❌ Wrong Answer Sound */
+function wrongSound(){
+
+  if(!soundEnabled) return;
+
+  initSound();
+
+  const now = audioCtx.currentTime;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "triangle";
+
+  osc.frequency.setValueAtTime(
+    280,
+    now
+  );
+
+  osc.frequency.exponentialRampToValueAtTime(
+    170,
+    now + 0.16
+  );
+
+  gain.gain.setValueAtTime(
+    0.001,
+    now
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.06,
+    now + 0.02
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    now + 0.22
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+
+  osc.stop(now + 0.24);
+}
+
+
+/* ==================================
+   SETTINGS
+   ================================== */
+
+settingsBtn.addEventListener("click", function(){
+
+  settings.style.display = "flex";
+
+  if(soundEnabled){
+    playTone(700, 0.08);
+  }
+
+});
+
+
+closeSettings.addEventListener("click", function(){
+
+  settings.style.display = "none";
+
+});
+
+
+soundToggle.addEventListener("change", function(){
+
+  soundEnabled = soundToggle.checked;
+
+  localStorage.setItem(
+    "mathMasterSound",
+    soundEnabled ? "on" : "off"
+  );
+
+  if(soundEnabled){
+
+    correctSound();
+
+  }
+
+});
+
+
+/* Close settings when background is clicked */
+
+settings.addEventListener("click", function(e){
+
+  if(e.target === settings){
+    settings.style.display = "none";
+  }
+
+});
+
+
+/* ==================================
+   RANDOM NUMBER
+   ================================== */
+
+function randomNumber(min, max){
+
+  return Math.floor(
+    Math.random() * (max - min + 1)
+  ) + min;
+
+}
+
+
+/* ==================================
+   CREATE QUESTION
+   ================================== */
+
+function createQuestion(){
+
+  clearInterval(timer);
+
+  message.textContent = "";
+
+  answerButtons.forEach(function(btn){
+
+    btn.classList.remove("correct");
+    btn.classList.remove("wrong");
+
+    btn.disabled = false;
+
+  });
+
+
+  const operations = [
+    "+",
+    "-",
+    "×",
+    "÷"
+  ];
+
+  const operation =
+    operations[
+      randomNumber(0, operations.length - 1)
+    ];
+
+
+  let a;
+  let b;
+
+
+  if(operation === "+"){
+
+    a = randomNumber(1,20);
+    b = randomNumber(1,20);
+
+    correctAnswer = a + b;
+
+  }
+
+
+  else if(operation === "-"){
+
+    a = randomNumber(5,30);
+    b = randomNumber(1,a);
+
+    correctAnswer = a - b;
+
+  }
+
+
+  else if(operation === "×"){
+
+    a = randomNumber(1,10);
+    b = randomNumber(1,10);
+
+    correctAnswer = a * b;
+
+  }
+
+
+  else{
+
+    b = randomNumber(1,10);
+    correctAnswer = randomNumber(1,10);
+
+    a = b * correctAnswer;
+
+  }
+
+
+  question.textContent =
+    a + " " + operation + " " + b + " = ?";
+
+
+  /* Create answers */
+
+  let answers = [
+    correctAnswer
+  ];
+
+
+  while(answers.length < 4){
+
+    let wrong =
+      correctAnswer +
+      randomNumber(-10,10);
+
+    if(
+      wrong >= 0 &&
+      !answers.includes(wrong)
+    ){
+
+      answers.push(wrong);
+
+    }
+
+  }
+
+
+  /* Shuffle */
+
+  answers.sort(
+    () => Math.random() - 0.5
+  );
+
+
+  answerButtons.forEach(function(btn,index){
+
+    btn.textContent = answers[index];
+
+    btn.dataset.answer = answers[index];
+
+  });
+
+
+  startTimer();
+
+}
+
+
+/* ==================================
+   TIMER
+   ================================== */
+
+function startTimer(){
+
+  timeLeft = 15;
+
+  timeText.textContent = timeLeft;
+
+  timerBar.style.width = "100%";
+
+
+  timer = setInterval(function(){
+
+    timeLeft--;
+
+    timeText.textContent = timeLeft;
+
+    timerBar.style.width =
+      (timeLeft / 15 * 100) + "%";
+
+
+    if(timeLeft <= 0){
+
+      clearInterval(timer);
+
+      timeUp();
+
+    }
+
+  },1000);
+
+}
+
+
+/* ==================================
+   TIME UP
+   ================================== */
+
+function timeUp(){
+
+  answerButtons.forEach(function(btn){
+
+    btn.disabled = true;
+
+    if(
+      Number(btn.dataset.answer) ===
+      correctAnswer
+    ){
+
+      btn.classList.add("correct");
+
+    }
+
+  });
+
+
+  message.textContent =
+    "⏰ समय समाप्त!";
+
+  message.style.color = "#ff9800";
+
+  lives--;
+
+  livesText.textContent = lives;
+
+  wrongSound();
+
+  nextBtn.style.display = "block";
+
+
+  if(lives <= 0){
+
+    setTimeout(endGame,800);
+
+  }
+
+}
+
+
+/* ==================================
+   CHECK ANSWER
+   ================================== */
+
+function checkAnswer(index){
+
+  clearInterval(timer);
+
+
+  answerButtons.forEach(function(btn){
+
+    btn.disabled = true;
+
+  });
+
+
+  const selected =
+    Number(
+      answerButtons[index].dataset.answer
+    );
+
+
+  /* ✅ CORRECT */
+
+  if(selected === correctAnswer){
+
+    correctSound();
+
+    score += 10;
+
+    scoreText.textContent = score;
+
+    answerButtons[index]
+      .classList.add("correct");
+
+    message.textContent =
+      "🎉 बहुत बढ़िया! सही जवाब!";
+
+    message.style.color = "#20a95a";
+
+  }
+
+
+  /* ❌ WRONG */
+
+  else{
+
+    wrongSound();
+
+    lives--;
+
+    livesText.textContent = lives;
+
+    answerButtons[index]
+      .classList.add("wrong");
+
+    message.textContent =
+      "❌ गलत जवाब!";
+
+    message.style.color = "#e53935";
+
+
+    /* Show correct answer */
+
+    answerButtons.forEach(function(btn){
+
+      if(
+        Number(btn.dataset.answer) ===
+        correctAnswer
+      ){
+
+        btn.classList.add("correct");
+
+      }
+
+    });
+
+  }
+
+
+  nextBtn.style.display = "block";
+
+
+  if(lives <= 0){
+
+    setTimeout(endGame,800);
+
+  }
+
+}
+
+
+/* ==================================
+   NEXT QUESTION
+   ================================== */
+
+function nextQuestion(){
+
+  if(lives <= 0){
+
+    endGame();
+
+    return;
+
+  }
+
+  nextBtn.style.display = "none";
+
+  createQuestion();
+
+}
+
+
+/* ==================================
+   GAME START
+   ================================== */
+
+function startGame(){
+
+  score = 0;
+
+  lives = 3;
+
+  scoreText.textContent = score;
+
+  livesText.textContent = lives;
+
+  gameScreen.style.display = "block";
+
+  gameOver.style.display = "none";
+
+  nextBtn.style.display = "none";
+
+  createQuestion();
+
+}
+
+
+/* ==================================
+   GAME OVER
+   ================================== */
+
+function endGame(){
+
+  clearInterval(timer);
+
+  gameScreen.style.display = "none";
+
+  gameOver.style.display = "block";
+
+  finalScore.textContent =
+    score + " Points";
+
+}
+
+
+/* ==================================
+   BUTTON EVENTS
+   ================================== */
+
+answerButtons.forEach(function(btn,index){
+
+  btn.addEventListener(
+    "click",
+    function(){
+
+      checkAnswer(index);
+
+    }
+  );
+
+});
+
+
+nextBtn.addEventListener(
+  "click",
+  nextQuestion
+);
+
+
+restartBtn.addEventListener(
+  "click",
+  function(){
+
+    startGame();
+
+  }
+);
+
+
+/* ==================================
+   START GAME
+   ================================== */
+
+startGame();
+
+</script>
+
+</body>
+      </html>
